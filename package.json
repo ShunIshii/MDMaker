@@ -1,0 +1,14 @@
+{
+  "name": "mdmaker",
+  "version": "1.0.0",
+  "description": "html -> markdown",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ShunIshii",
+  "license": "ISC",
+  "dependencies": {
+    "turndown": "^6.0.0"
+  }
+}
