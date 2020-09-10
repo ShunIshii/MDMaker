@@ -6,7 +6,6 @@ var request = require('request');
 var fs = require('fs');
 
 let defaultUrl = 'https://social.msdn.microsoft.com/Forums/ja-JP/4e6223e2-34d0-4a5f-bb61-109bc28040b6/windows-10-1249612540124721251912531-2004-20h1-1997812391';
-let outputFileName = 'page2.md';
 
 function getUrl() {
   if (process.argv.length == 3) {
@@ -30,27 +29,35 @@ function main() {
       return;
     }
 
-    var body = analysis(html);
+    var blogObj = getBody(html);
 
-    var markdown = turndownService.turndown(body);
-    writeFile('generated/' + outputFileName, markdown);
+    // 10進数の数値文字参照を通常テキストへデコードするために、マークダウンに変換するツールを使用
+    blogObj.title = turndownService.turndown(blogObj.title);
+
+    var markdown = turndownService.turndown(blogObj.body);
+
+    var outputFileName = blogObj.title + '.md';
+    writeFile('generated/', outputFileName, markdown);
   });
 }
 
-function writeFile(path, data) {
-  fs.writeFile(path, data, function (err) {
+function writeFile(path, fileName, data) {
+  fs.writeFile(path + fileName, data, function (err) {
     if (err) {
         throw err;
     }
     else {
-      console.log('Generated "' + outputFileName + '" in "generated/" folder.');
+      console.log('[Generated] ' + fileName);
     }
   });
 }
 
-function analysis(htmlStrings) {
+function getBody(htmlStrings) {
   var domParser = new DomParser();
+  var obj = new Object();
   var doc = domParser.parseFromString(htmlStrings, 'text/html');
-  var body = doc.getElementsByClassName('body');
-  return(body[0].innerHTML);
+  obj.title = doc.getElementsByTagName('title')[0].innerHTML;
+  obj.body = doc.getElementsByClassName('body')[0].innerHTML;
+  return(obj);
 }
+
