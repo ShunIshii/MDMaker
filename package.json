@@ -9,6 +9,7 @@
   "author": "ShunIshii",
   "license": "ISC",
   "dependencies": {
+    "dom-parser": "^0.1.6",
     "turndown": "^6.0.0"
   }
 }
