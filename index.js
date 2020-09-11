@@ -26,10 +26,56 @@ function main() {
     obj.title = turndownService.turndown(obj.title);
 
     var markdown = getYamlInfo(obj) + turndownService.turndown(obj.body);
+    var imageUrls = getImageUrls(markdown);
+    if (imageUrls.length > 0) {
+      getImages(imageUrls, obj.title);
+      markdown = replaceImageUrls(imageUrls, markdown);
+    }
 
     var outputFileName = obj.title + '.md';
     writeFile('generated/', outputFileName, markdown);
   });
+}
+
+function replaceImageUrls(urls, body) {
+  for (var i = 0; i < urls.length; i++) {
+    body = body.replace(urls[i], 'image' + (i+1) + '.png');
+  }
+  return body;
+}
+
+function getImages(urls, title) {
+  var folderName = 'generated/' + title;
+  if (!fs.existsSync(folderName)) {
+    fs.mkdirSync(folderName)
+  }
+
+  var imageNum = 1;
+  for (var i = 0; i < urls.length; i++) {
+    var url = urls[i];
+    request(
+      {method: 'GET', url: url, encoding: null},
+      function (error, response, body){
+        if(!error && response.statusCode === 200){
+          fs.writeFileSync(folderName + '/image' + (imageNum++) + '.png', body, 'binary');
+        }
+      }
+    );
+  }
+}
+
+function getImageUrls(body) {
+  var urls = [];
+  var urlStartIndex = body.indexOf('https://social.msdn.microsoft.com/Forums/getfile/');
+
+  while (urlStartIndex != -1) {
+    var urlEndIndex = body.indexOf(')', urlStartIndex);
+    var url = body.substring(urlStartIndex, urlEndIndex);
+    urls.push(url);
+    urlStartIndex = body.indexOf('https://social.msdn.microsoft.com/Forums/getfile/', urlEndIndex);
+  }
+
+  return urls;
 }
 
 function getUrl() {
