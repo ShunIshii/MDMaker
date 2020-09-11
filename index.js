@@ -110,7 +110,7 @@ function getBody(htmlStrings) {
   var domParser = new DomParser();
   var obj = new Object();
   var doc = domParser.parseFromString(htmlStrings, 'text/html');
-  obj.title = doc.getElementsByTagName('title')[0].innerHTML.replace('/', '-');
+  obj.title = doc.getElementsByTagName('title')[0].innerHTML.replace('/', '-').replace(' : ', '：');
   obj.body = doc.getElementsByClassName('body')[0].innerHTML;
   obj.date = formatDate(doc.getElementsByClassName('date')[0].textContent);
   return(obj);
